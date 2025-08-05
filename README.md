@@ -1,4 +1,4 @@
-# MedChain - Blockchain-Based Drug Supply Chain Management System
+# Maverchain - Blockchain-Based Drug Supply Chain Management System
 
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen)](https://nodejs.org/)
@@ -27,11 +27,11 @@
 
 ## Overview
 
-MedChain is a comprehensive blockchain-based drug supply chain management system that ensures transparency, authenticity, and traceability of pharmaceutical products from manufacturer to end consumer. Built on Ethereum blockchain technology, it prevents counterfeit drugs from entering the supply chain while providing real-time tracking and verification capabilities.
+Maverchain is a comprehensive blockchain-based drug supply chain management system that ensures transparency, authenticity, and traceability of pharmaceutical products from manufacturer to end consumer. Built on Ethereum blockchain technology, it prevents counterfeit drugs from entering the supply chain while providing real-time tracking and verification capabilities.
 
 ## Team
 
-**Team Name:** MedChain Innovation Team
+**Team Name:** Maverchain Innovation Team
 
 **Team Members:**
 - Lead Developer & Blockchain Architect
@@ -51,7 +51,7 @@ The pharmaceutical industry faces critical challenges:
 
 ## Solution
 
-MedChain provides a decentralized, transparent, and secure platform for managing pharmaceutical supply chains using blockchain technology. The system creates an immutable record of each drug's journey from manufacturer to patient, ensuring authenticity and enabling rapid identification of counterfeit products.
+Maverchain provides a decentralized, transparent, and secure platform for managing pharmaceutical supply chains using blockchain technology. The system creates an immutable record of each drug's journey from manufacturer to patient, ensuring authenticity and enabling rapid identification of counterfeit products.
 
 ## Key Features
 
@@ -401,7 +401,7 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ```
 MIT License
 
-Copyright (c) 2025 MedChain Innovation Team
+Copyright (c) 2025 Mavericks Team
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -452,7 +452,7 @@ A: This is a development version. Additional security audits and testing are rec
 
 ---
 
-**Built with ❤️ by the MedChain Innovation Team**
+**Built by the Mavericks Team**
 
 *Securing pharmaceutical supply chains through blockchain technology*
 REACT_APP_CONTRACT_ADDRESS=[your-contract-address]
