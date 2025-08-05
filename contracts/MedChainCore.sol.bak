@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "./DrugTypes.sol";
+import "./DrugRequests.sol";
+import "./DrugLifecycle.sol";
+import "./MedChainBase.sol";
+
+contract MedChainCore is MedChainBase {
+    using DrugLifecycle for DrugTypes.DrugBatch;
+    using DrugRequests for mapping(uint256 => DrugTypes.DrugBatch);
+
+    mapping(address => mapping(uint256 => bool)) public verifiedDrugs;
+    mapping(bytes32 => bool) public whoApprovedDrugs;
+    mapping(address => DrugTypes.Hospital) public hospitals;
+    mapping(address => uint256[]) public patientBatches;
+    mapping(uint256 => DrugTypes.ExpiredDrugReport) public expiredReports;
+    uint256 private nextReportId;
+
+    // Events
+    event HospitalRegistered(address indexed hospital, string name, DrugTypes.HospitalType hospitalType);
+    event StockThresholdReached(address indexed hospital, uint256 currentStock, uint256 threshold);
+    event DrugVerified(uint256 indexed batchId, address verifier, bool isValid);
+
+    constructor() {
+        nextReportId = 1;
+    }
+
+    function grantManufacturerRole(address account) external onlyAdmin {
+        _grantRole(MANUFACTURER_ROLE, account);
+    }
+
+    function grantDistributorRole(address account) external onlyAdmin {
+        _grantRole(DISTRIBUTOR_ROLE, account);
+    }
+
+    function grantHospitalRole(address account) external onlyAdmin {
+        _grantRole(HOSPITAL_ROLE, account);
+    }
+
+    function grantPatientRole(address account) external onlyAdmin {
+        _grantRole(PATIENT_ROLE, account);
+    }
+}

@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "./MedChain.sol";
+
+library DrugLifecycle {
+    function createDrugBatch(
+        MedChain.DrugBatch storage drugBatch,
+        string memory drugName,
+        string memory drugCode,
+        string memory regulatoryApproval,
+        bytes32 merkleRoot,
+        string memory ipfsHash,
+        uint256 quantity,
+        uint256 expiryDate,
+        address manufacturer
+    ) external returns (uint256) {
+        require(quantity > 0, "Quantity must be greater than 0");
+        require(expiryDate > block.timestamp, "Expiry date must be in the future");
+        require(bytes(drugName).length > 0, "Drug name cannot be empty");
+        require(bytes(drugCode).length > 0, "Drug code cannot be empty");
+        require(bytes(ipfsHash).length > 0, "IPFS hash cannot be empty");
+        require(bytes(regulatoryApproval).length > 0, "Regulatory approval required");
+        
+        drugBatch.drugName = drugName;
+        drugBatch.drugCode = drugCode;
+        drugBatch.manufacturer = manufacturer;
+        drugBatch.merkleRoot = merkleRoot;
+        drugBatch.ipfsHash = ipfsHash;
+        drugBatch.quantity = quantity;
+        drugBatch.originalQuantity = quantity;
+        drugBatch.manufactureDate = block.timestamp;
+        drugBatch.expiryDate = expiryDate;
+        drugBatch.status = MedChain.DrugStatus.Manufactured;
+        drugBatch.currentHolder = manufacturer;
+        drugBatch.transferCount = 0;
+        drugBatch.isRecalled = false;
+        drugBatch.regulatoryApproval = regulatoryApproval;
+        
+        return drugBatch.batchId;
+    }
+    
+    function transferToDistributor(
+        MedChain.DrugBatch storage drugBatch,
+        address distributor
+    ) external {
+        require(!drugBatch.isRecalled, "Cannot transfer recalled batch");
+        require(block.timestamp < drugBatch.expiryDate, "Cannot transfer expired batch");
+        
+        drugBatch.status = MedChain.DrugStatus.WithDistributor;
+        drugBatch.currentHolder = distributor;
+        drugBatch.transferCount++;
+    }
+}

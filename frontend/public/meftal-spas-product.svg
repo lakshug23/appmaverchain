@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="300" height="200" rx="12" fill="url(#productGradient)" stroke="#4CAF50" stroke-width="2"/>
+  <defs>
+    <linearGradient id="productGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#C8E6C9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Product Box -->
+  <rect x="20" y="30" width="260" height="140" rx="8" fill="white" stroke="#4CAF50" opacity="0.9"/>
+  
+  <!-- MEFTAL-SPAS Text -->
+  <text x="150" y="60" font-family="Arial, sans-serif" font-size="20" font-weight="bold" text-anchor="middle" fill="#2E7D32">MEFTAL-SPAS</text>
+  <text x="150" y="80" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#2E7D32">TABLETS</text>
+  
+  <!-- Generic Name -->
+  <text x="150" y="105" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2E7D32">Mefenamic Acid and</text>
+  <text x="150" y="118" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2E7D32">Dicyclomine Hydrochloride</text>
+  <text x="150" y="131" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#2E7D32">Tablets IP</text>
+  
+  <!-- Pills representation -->
+  <circle cx="80" cy="150" r="8" fill="#FFD700"/>
+  <circle cx="100" cy="150" r="8" fill="#FFD700"/>
+  <circle cx="120" cy="150" r="8" fill="#FFD700"/>
+  <circle cx="140" cy="150" r="8" fill="#FFD700"/>
+  <circle cx="160" cy="150" r="8" fill="#FFD700"/>
+  <circle cx="180" cy="150" r="8" fill="#FFD700"/>
+  <circle cx="200" cy="150" r="8" fill="#FFD700"/>
+  <circle cx="220" cy="150" r="8" fill="#FFD700"/>
+</svg>

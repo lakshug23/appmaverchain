@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/proxy/beacon/UpgradeableBeacon.sol";
+import "@openzeppelin/contracts/proxy/beacon/BeaconProxy.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+
+contract MedChainFactory is AccessControl {
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    UpgradeableBeacon public immutable beacon;
+    address[] public allMedChains;
+
+    event MedChainDeployed(address indexed medChainAddress, address indexed owner);
+    event ImplementationUpdated(address indexed newImplementation);
+
+    constructor(address implementation_) {
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
+        
+        beacon = new UpgradeableBeacon(implementation_);
+        transferOwnership(msg.sender);
+    }
+
+    function deployMedChain(bytes memory data) external onlyRole(ADMIN_ROLE) returns (address) {
+        BeaconProxy proxy = new BeaconProxy(
+            address(beacon),
+            data
+        );
+        
+        allMedChains.push(address(proxy));
+        emit MedChainDeployed(address(proxy), msg.sender);
+        
+        return address(proxy);
+    }
+
+    function updateImplementation(address newImplementation) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        beacon.upgradeTo(newImplementation);
+        emit ImplementationUpdated(newImplementation);
+    }
+
+    function getAllMedChains() external view returns (address[] memory) {
+        return allMedChains;
+    }
+
+    function transferOwnership(address newOwner) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(newOwner != address(0), "New owner cannot be zero address");
+        _grantRole(DEFAULT_ADMIN_ROLE, newOwner);
+        _revokeRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+}

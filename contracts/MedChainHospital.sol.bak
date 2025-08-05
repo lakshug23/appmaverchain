@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "./MedChainCore.sol";
+
+contract MedChainHospital is MedChainCore {
+    function registerHospital(
+        address _hospital,
+        string memory _name,
+        string memory _registrationNumber,
+        DrugTypes.HospitalType _hospitalType,
+        uint256 _stockThreshold,
+        uint256 _capacity
+    ) external onlyAdmin {
+        require(!hospitals[_hospital].isActive, "Hospital already registered");
+        require(bytes(_name).length > 0, "Hospital name cannot be empty");
+        require(bytes(_registrationNumber).length > 0, "Registration number required");
+        require(_capacity > 0, "Hospital capacity must be positive");
+        
+        hospitals[_hospital] = DrugTypes.Hospital({
+            hospitalAddress: _hospital,
+            name: _name,
+            registrationNumber: _registrationNumber,
+            hospitalType: _hospitalType,
+            stockCount: 0,
+            stockThreshold: _stockThreshold,
+            isActive: true,
+            isVerified: true,
+            capacity: _capacity
+        });
+        
+        _grantRole(HOSPITAL_ROLE, _hospital);
+        emit HospitalRegistered(_hospital, _name, _hospitalType);
+    }
+
+    function getHospital(address _hospital) external view returns (DrugTypes.Hospital memory) {
+        return hospitals[_hospital];
+    }
+}

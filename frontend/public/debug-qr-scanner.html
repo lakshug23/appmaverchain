@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        #qr-reader {
+            margin: 20px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .status {
+            padding: 15px;
+            border-Radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.info { background: #e3f2fd; color: #1976d2; }
+        .status.success { background: #e8f5e8; color: #2e7d32; }
+        .status.error { background: #ffebee; color: #c62828; }
+        .result {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 QR Scanner Debug Test</h1>
+        <p>This test will help debug QR scanner issues step by step.</p>
+        
+        <div class="status info" id="status">
+            Ready to test QR scanner...
+        </div>
+        
+        <button onclick="testCameraPermissions()">1. Test Camera Permissions</button>
+        <button onclick="initializeScanner()">2. Initialize QR Scanner</button>
+        <button onclick="startScanning()" id="startBtn" disabled>3. Start Scanning</button>
+        <button onclick="testWithFile()">4. Test with File Upload</button>
+        
+        <div id="qr-reader"></div>
+        
+        <div id="result" class="result" style="display: none;"></div>
+        
+        <div id="debug-info" style="margin-top: 20px; font-size: 12px; color: #666;"></div>
+    </div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script>
+        let html5QrCode = null;
+        let isScanning = false;
+        
+        function updateStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        function updateDebug(info) {
+            document.getElementById('debug-info').innerHTML = info;
+        }
+        
+        async function testCameraPermissions() {
+            updateStatus('Testing camera permissions...', 'info');
+            
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: "environment" 
+                    } 
+                });
+                
+                updateStatus('✅ Camera permissions granted!', 'success');
+                updateDebug(`Camera found: ${stream.getVideoTracks().length} video tracks`);
+                
+                // Stop the stream
+                stream.getTracks().forEach(track => track.stop());
+                
+                document.getElementById('startBtn').disabled = false;
+                
+            } catch (error) {
+                updateStatus(`❌ Camera permission denied: ${error.message}`, 'error');
+                updateDebug(`Error details: ${JSON.stringify(error, null, 2)}`);
+            }
+        }
+        
+        function initializeScanner() {
+            updateStatus('Initializing QR scanner...', 'info');
+            
+            try {
+                html5QrCode = new Html5Qrcode("qr-reader");
+                updateStatus('✅ QR scanner initialized!', 'success');
+                updateDebug('Html5Qrcode object created successfully');
+                
+            } catch (error) {
+                updateStatus(`❌ Scanner initialization failed: ${error.message}`, 'error');
+                updateDebug(`Error details: ${JSON.stringify(error, null, 2)}`);
+            }
+        }
+        
+        function extractCodeFromQR(qrContent) {
+            console.log('Raw QR Content:', qrContent);
+            
+            // Pattern 1: Extract from qrbcl.com short links
+            const qrbclMatch = qrContent.match(/qrbcl\.com\/\d+\/([A-Za-z0-9]+)/);
+            if (qrbclMatch) return qrbclMatch[1];
+            
+            // Pattern 2: Extract from localhost verify links
+            const localhostMatch = qrContent.match(/localhost:\d+\/verify\?code=([A-Za-z0-9]+)/);
+            if (localhostMatch) return localhostMatch[1];
+            
+            // Pattern 3: Extract from any verify URL with code parameter  
+            const codeParamMatch = qrContent.match(/[?&]code=([A-Za-z0-9]+)/);
+            if (codeParamMatch) return codeParamMatch[1];
+            
+            // Pattern 4: Check if it's already a plain code
+            const plainCodeMatch = qrContent.match(/^[A-Za-z0-9]{4,20}$/);
+            if (plainCodeMatch) return qrContent;
+            
+            // Pattern 5: Extract batch numbers (MST followed by numbers)
+            const batchMatch = qrContent.match(/MST\d+/);
+            if (batchMatch) return batchMatch[0];
+            
+            // Fallback: return original content
+            return qrContent;
+        }
+        
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log('QR Code detected:', decodedText);
+            
+            const extractedCode = extractCodeFromQR(decodedText);
+            
+            updateStatus(`✅ QR Code scanned! Extracted: ${extractedCode}`, 'success');
+            
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('result').innerHTML = `
+                <h3>Scan Result:</h3>
+                <p><strong>Raw Content:</strong> ${decodedText}</p>
+                <p><strong>Extracted Code:</strong> ${extractedCode}</p>
+                <p><strong>Would redirect to:</strong> /verify?code=${encodeURIComponent(extractedCode)}</p>
+            `;
+            
+            // Stop scanning
+            if (html5QrCode && isScanning) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    updateStatus('Scanner stopped. Scan again if needed.', 'info');
+                });
+            }
+        }
+        
+        function onScanFailure(error) {
+            // Don't spam console with scanning attempts
+            if (!error.toString().includes('NotFoundException')) {
+                console.log('Scan error:', error);
+            }
+        }
+        
+        async function startScanning() {
+            if (!html5QrCode) {
+                updateStatus('❌ Scanner not initialized. Click "Initialize QR Scanner" first.', 'error');
+                return;
+            }
+            
+            if (isScanning) {
+                updateStatus('Scanner already running...', 'info');
+                return;
+            }
+            
+            updateStatus('Starting QR scanner...', 'info');
+            
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0,
+                showTorchButtonIfSupported: true,
+                showZoomSliderIfSupported: true,
+                defaultZoomValueIfSupported: 2
+            };
+            
+            try {
+                await html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                );
+                
+                isScanning = true;
+                updateStatus('🎯 Scanner running! Point camera at QR code.', 'success');
+                updateDebug('Scanner started with config: ' + JSON.stringify(config, null, 2));
+                
+            } catch (error) {
+                updateStatus(`❌ Failed to start scanner: ${error.message}`, 'error');
+                updateDebug(`Error details: ${JSON.stringify(error, null, 2)}`);
+            }
+        }
+        
+        function testWithFile() {
+            if (!html5QrCode) {
+                updateStatus('❌ Scanner not initialized. Click "Initialize QR Scanner" first.', 'error');
+                return;
+            }
+            
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+            
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    updateStatus('Scanning uploaded file...', 'info');
+                    
+                    html5QrCode.scanFile(file, true)
+                        .then(decodedText => {
+                            onScanSuccess(decodedText, null);
+                        })
+                        .catch(err => {
+                            updateStatus(`❌ File scan failed: ${err}`, 'error');
+                        });
+                }
+            };
+            
+            input.click();
+        }
+        
+        // Auto-run basic tests on load
+        window.onload = function() {
+            updateStatus('Page loaded. Ready to test!', 'info');
+            updateDebug('Html5Qrcode available: ' + (typeof Html5Qrcode !== 'undefined'));
+        };
+    </script>
+</body>
+</html>

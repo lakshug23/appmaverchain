@@ -1,0 +1,87 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+library DrugTypes {
+    enum DrugStatus { 
+        Manufactured, 
+        WithDistributor, 
+        WithHospital, 
+        DispensedToPatient, 
+        Expired 
+    }
+    
+    enum HospitalType { Urban, Rural }
+    enum RequestStatus { Pending, Approved, Rejected, Fulfilled }
+
+    struct DrugBatch {
+        uint256 batchId;
+        string drugName;
+        string drugCode;
+        address manufacturer;
+        bytes32 merkleRoot;
+        string ipfsHash;
+        uint256 quantity;
+        uint256 originalQuantity;
+        uint256 manufactureDate;
+        uint256 expiryDate;
+        DrugStatus status;
+        address currentHolder;
+        uint256 transferCount;
+        bool isRecalled;
+        string regulatoryApproval;
+    }
+
+    struct Hospital {
+        address hospitalAddress;
+        string name;
+        string registrationNumber;
+        HospitalType hospitalType;
+        uint256 stockCount;
+        uint256 stockThreshold;
+        bool isActive;
+        bool isVerified;
+        uint256 capacity;
+    }
+
+    struct DrugRequest {
+        uint256 requestId;
+        address hospital;
+        address distributor;
+        uint256 batchId;
+        uint256 quantity;
+        RequestStatus status;
+        uint256 timestamp;
+        uint256 priorityScore;
+        string reason;
+        string urgencyLevel;
+    }
+
+    struct DistributorRequest {
+        uint256 requestId;
+        address distributor;
+        address manufacturer;
+        string drugName;
+        uint256 quantity;
+        RequestStatus status;
+        uint256 timestamp;
+        string reason;
+        string urgencyLevel;
+        uint256 proposedPrice;
+    }
+
+    struct HealthRecord {
+        address patient;
+        string ipfsHash;
+        uint256 lastUpdated;
+        bool exists;
+    }
+
+    struct ExpiredDrugReport {
+        uint256 reportId;
+        uint256 batchId;
+        address reporter;
+        string ipfsHash;
+        uint256 timestamp;
+        bool verified;
+    }
+}

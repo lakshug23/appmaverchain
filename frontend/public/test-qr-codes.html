@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test QR Codes for Scanner</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .qr-item {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+        .qr-item h3 {
+            color: #333;
+            margin-top: 10px;
+            font-size: 16px;
+        }
+        .qr-item p {
+            color: #666;
+            font-size: 12px;
+            margin: 5px 0;
+            word-break: break-all;
+        }
+        canvas {
+            border-radius: 10px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .instructions {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .back-button {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .back-button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/" class="back-button">← Back to MaverChain</a>
+        <div class="header">
+            <h1>🎯 Test QR Codes for Scanner</h1>
+            <p>Use these QR codes to test the MaverChain QR Scanner functionality</p>
+        </div>
+        <div class="instructions">
+            <h3>📱 How to Test:</h3>
+            <ol>
+                <li>Go to <strong>/scan</strong> route or click QR Scanner button</li>
+                <li>Allow camera permissions when prompted</li>
+                <li>Point your camera at any of the QR codes below</li>
+                <li>The scanner should detect and display the result</li>
+            </ol>
+        </div>
+        <div class="qr-grid" id="qrContainer">
+            <div class="qr-item">
+                <h3>🌐 Website URL</h3>
+                <canvas id="qr1" class="qr-code"></canvas>
+                <div class="qr-data" id="data1"></div>
+            </div>
+            <div class="qr-item">
+                <h3>💊 Drug Verification URL</h3>
+                <canvas id="qr2" class="qr-code"></canvas>
+                <div class="qr-data" id="data2"></div>
+            </div>
+            <div class="qr-item">
+                <h3>📞 Contact vCard</h3>
+                <canvas id="qr3" class="qr-code"></canvas>
+                <div class="qr-data" id="data3"></div>
+            </div>
+            <div class="qr-item">
+                <h3>📶 WiFi Credentials</h3>
+                <canvas id="qr4" class="qr-code"></canvas>
+                <div class="qr-data" id="data4"></div>
+            </div>
+            <div class="qr-item">
+                <h3>💬 Text Message</h3>
+                <canvas id="qr5" class="qr-code"></canvas>
+                <div class="qr-data" id="data5"></div>
+            </div>
+            <div class="qr-item">
+                <h3>🔗 Blockchain Transaction</h3>
+                <canvas id="qr6" class="qr-code"></canvas>
+                <div class="qr-data" id="data6"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // QR Code data
+        const qrData = [
+            { 
+                id: 1, 
+                data: 'https://maverchain.com',
+                description: 'External website URL'
+            },
+            { 
+                id: 2, 
+                data: window.location.origin + '/verify',
+                description: 'Internal verification page'
+            },
+            { 
+                id: 3, 
+                data: 'BEGIN:VCARD\nVERSION:3.0\nFN:MaverChain Support\nORG:MaverChain\nTEL:+1-555-0123\nEMAIL:support@maverchain.com\nEND:VCARD',
+                description: 'Contact card (vCard format)'
+            },
+            { 
+                id: 4, 
+                data: 'WIFI:T:WPA;S:MaverChain-Guest;P:scanner123;H:false;;',
+                description: 'WiFi connection info'
+            },
+            { 
+                id: 5, 
+                data: JSON.stringify({
+                    batchId: "456",
+                    drugName: "Paracetamol",
+                    manufacturer: "PharmaCorp",
+                    expiryDate: "2025-12-31"
+                }),
+                description: 'JSON drug data'
+            },
+            { 
+                id: 6, 
+                data: 'This is just plain text for testing the QR scanner.',
+                description: 'Plain text message'
+            },
+            { 
+                id: 7, 
+                data: 'BEGIN:VCARD\nVERSION:3.0\nFN:Dr. Smith\nORG:City Hospital\nTEL:+1234567890\nEMAIL:dr.smith@hospital.com\nEND:VCARD',
+                description: 'Contact information'
+            },
+            { 
+                id: 8, 
+                data: 'Hospital batch #789 - Aspirin 500mg',
+                description: 'Hospital batch information'
+            }
+        ];
+
+        // Generate QR codes
+        qrData.forEach(item => {
+            const canvas = document.getElementById(`qr${item.id}`);
+            const dataDiv = document.getElementById(`data${item.id}`);
+            
+            // Display the data
+            dataDiv.textContent = item.data;
+            
+            // Generate QR code
+            QRCode.toCanvas(canvas, item.data, {
+                width: 200,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }, function (error) {
+                if (error) {
+                    console.error('Error generating QR code:', error);
+                    canvas.style.display = 'none';
+                    dataDiv.innerHTML = '<span style="color: red;">Error generating QR code</span>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

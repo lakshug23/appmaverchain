@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner Test</title>
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        #qr-reader {
+            width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #bbdefb;
+        }
+        
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #c8e6c9;
+        }
+        
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+        }
+        
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .result-container.show {
+            display: block;
+        }
+        
+        .result-text {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            word-break: break-all;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #666;
+            color: white;
+        }
+        
+        .debug {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 QR Scanner Test</h1>
+        <p>This is a simple test version to debug QR scanning issues</p>
+        
+        <div id="qr-reader"></div>
+        
+        <div id="status" class="status info">
+            Initializing camera...
+        </div>
+        
+        <div id="result-container" class="result-container">
+            <h3>📄 Scanned Result:</h3>
+            <div id="result-text" class="result-text"></div>
+            <button class="btn btn-primary" onclick="copyResult()">📋 Copy</button>
+            <button class="btn btn-secondary" onclick="scanAgain()">🔄 Scan Again</button>
+        </div>
+        
+        <div class="debug" id="debug">
+            <h4>Debug Info:</h4>
+            <div id="debug-log"></div>
+        </div>
+    </div>
+
+    <script>
+        let html5QrCode;
+        let isScanning = false;
+        
+        function debugLog(message) {
+            const debugLog = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            console.log(message);
+        }
+        
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            debugLog(`Status: ${message} (${type})`);
+        }
+        
+        function showResult(result) {
+            const resultContainer = document.getElementById('result-container');
+            const resultText = document.getElementById('result-text');
+            
+            resultText.textContent = result;
+            resultContainer.classList.add('show');
+            
+            showStatus('✅ QR Code scanned successfully!', 'success');
+            debugLog(`Result: ${result}`);
+        }
+        
+        function copyResult() {
+            const resultText = document.getElementById('result-text').textContent;
+            navigator.clipboard.writeText(resultText).then(() => {
+                showStatus('📋 Result copied to clipboard!', 'success');
+            }).catch(() => {
+                showStatus('❌ Could not copy to clipboard', 'error');
+            });
+        }
+        
+        function scanAgain() {
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.classList.remove('show');
+            
+            if (html5QrCode && !isScanning) {
+                startScanning();
+            }
+        }
+        
+        function onScanSuccess(decodedText, decodedResult) {
+            debugLog(`QR Code detected: ${decodedText}`);
+            
+            // Stop scanning
+            if (html5QrCode && isScanning) {
+                html5QrCode.stop().then(() => {
+                    isScanning = false;
+                    showResult(decodedText);
+                }).catch((err) => {
+                    debugLog(`Error stopping scanner: ${err}`);
+                });
+            }
+        }
+        
+        function onScanFailure(error) {
+            // Handle scan failure silently - this fires constantly while scanning
+            // debugLog(`Scan failure: ${error}`);
+        }
+        
+        function startScanning() {
+            if (isScanning) {
+                debugLog('Scanner already running');
+                return;
+            }
+            
+            debugLog('Starting scanner...');
+            showStatus('🔍 Scanning for QR codes...', 'info');
+            
+            const config = {
+                fps: 10,
+                qrbox: { width: 250, height: 250 },
+                aspectRatio: 1.0,
+                showTorchButtonIfSupported: true,
+                showZoomSliderIfSupported: true,
+                defaultZoomValueIfSupported: 2
+            };
+            
+            debugLog(`Config: ${JSON.stringify(config)}`);
+            
+            html5QrCode.start(
+                { facingMode: "environment" }, // Use back camera
+                config,
+                onScanSuccess,
+                onScanFailure
+            ).then(() => {
+                isScanning = true;
+                showStatus('🎯 Point camera at QR code', 'info');
+                debugLog('Scanner started successfully');
+            }).catch((err) => {
+                debugLog(`Error starting scanner: ${err}`);
+                showStatus(`❌ Could not start camera: ${err}`, 'error');
+            });
+        }
+        
+        // Initialize scanner when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('Page loaded, initializing scanner...');
+            
+            if (typeof Html5Qrcode === 'undefined') {
+                debugLog('ERROR: Html5Qrcode library not loaded');
+                showStatus('❌ QR scanner library failed to load', 'error');
+                return;
+            }
+            
+            html5QrCode = new Html5Qrcode("qr-reader");
+            debugLog('Scanner instance created');
+            
+            // Request camera permissions and start scanning
+            Html5Qrcode.getCameras().then(devices => {
+                debugLog(`Found ${devices.length} cameras: ${JSON.stringify(devices)}`);
+                if (devices && devices.length) {
+                    showStatus('📷 Camera found! Starting scanner...', 'success');
+                    setTimeout(startScanning, 1000);
+                } else {
+                    showStatus('❌ No cameras found on this device', 'error');
+                }
+            }).catch(err => {
+                debugLog(`Error getting cameras: ${err}`);
+                showStatus('❌ Could not access camera. Please check permissions.', 'error');
+            });
+        });
+        
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                debugLog('Page hidden, stopping scanner');
+                if (html5QrCode && isScanning) {
+                    html5QrCode.stop().then(() => {
+                        isScanning = false;
+                    }).catch((err) => {
+                        debugLog(`Error stopping scanner: ${err}`);
+                    });
+                }
+            } else {
+                debugLog('Page visible, checking if should restart scanner');
+                const resultContainer = document.getElementById('result-container');
+                if (!resultContainer.classList.contains('show')) {
+                    setTimeout(startScanning, 500);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

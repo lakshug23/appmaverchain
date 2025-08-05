@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Redirect Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            min-width: 200px;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        .countdown {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196f3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 QR Redirect Test</h1>
+        <p>Test the auto-redirect functionality without scanning</p>
+        
+        <button onclick="testRedirect('BVKB51BWRV')">Test MEFTAL-SPAS (BVKB51BWRV)</button>
+        <button onclick="testRedirect('MST2512')">Test Batch Number (MST2512)</button>
+        <button onclick="testRedirect('1')">Test Sample Drug (1)</button>
+        
+        <div id="countdown" class="countdown" style="display: none;"></div>
+        
+        <script>
+            function testRedirect(code) {
+                console.log('Testing redirect with code:', code);
+                
+                // Show countdown
+                const countdownEl = document.getElementById('countdown');
+                countdownEl.style.display = 'block';
+                
+                let timeLeft = 3;
+                countdownEl.innerHTML = `Redirecting to /verify?code=${code} in ${timeLeft}...`;
+                
+                const timer = setInterval(() => {
+                    timeLeft--;
+                    countdownEl.innerHTML = `Redirecting to /verify?code=${code} in ${timeLeft}...`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        window.location.href = `/verify?code=${encodeURIComponent(code)}`;
+                    }
+                }, 1000);
+            }
+        </script>
+    </div>
+</body>
+</html>

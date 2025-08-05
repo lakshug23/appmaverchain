@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+
+contract MedChainUpgradeable is 
+    Initializable, 
+    AccessControlUpgradeable, 
+    PausableUpgradeable,
+    ReentrancyGuardUpgradeable 
+{
+    // Your existing code from MedChain.sol here, but replace the constructor with initialize
+    // And make all state variables private
+    
+    // Role definitions
+    bytes32 private constant MANUFACTURER_ROLE = keccak256("MANUFACTURER_ROLE");
+    bytes32 private constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
+    bytes32 private constant HOSPITAL_ROLE = keccak256("HOSPITAL_ROLE");
+    bytes32 private constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
+    bytes32 private constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+
+    function initialize(address admin) public initializer {
+        __AccessControl_init();
+        __Pausable_init();
+        __ReentrancyGuard_init();
+        
+        _grantRole(DEFAULT_ADMIN_ROLE, admin);
+        _grantRole(ADMIN_ROLE, admin);
+    }
+    
+    // Your existing functions from MedChain.sol here
+    // Make sure to add upgradeTo functionality
+    
+    // This empty reserved space is put in place to allow future versions to add new
+    // variables without shifting down storage in the inheritance chain.
+    uint256[50] private __gap;
+}

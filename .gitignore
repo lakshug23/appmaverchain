@@ -1,0 +1,54 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+build/
+dist/
+frontend/build/
+frontend/dist/
+
+# Hardhat files
+cache/
+artifacts/
+deployments/localhost.json
+
+# Logs
+*.log
+hardhat-node.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# IDE files
+.vscode/
+.DS_Store
+*.swp
+*.swo
+
+# OS generated files
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/

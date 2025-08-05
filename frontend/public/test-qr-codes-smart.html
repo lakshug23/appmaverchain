@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedChain - Test QR Codes for Smart Scanner</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .qr-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border: 2px solid #f0f0f0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .qr-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .qr-code {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+        .drug-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c5530;
+            margin-bottom: 10px;
+        }
+        .drug-details {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .code-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #495057;
+            margin-top: 15px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .instructions {
+            background: #e3f2fd;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #2196f3;
+        }
+        .instructions h3 {
+            color: #1976d2;
+            margin-top: 0;
+        }
+        .instructions ol {
+            color: #424242;
+            line-height: 1.8;
+        }
+        .logo-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .blue-cross-logo {
+            display: inline-block;
+            background: #0066cc;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 MedChain Smart QR Scanner</h1>
+        <p class="subtitle">Test QR Codes for Drug Verification System</p>
+        
+        <div class="instructions">
+            <h3>📱 How to Test:</h3>
+            <ol>
+                <li>Start your MedChain frontend server</li>
+                <li>Navigate to <code>http://localhost:3000/scan</code></li>
+                <li>Allow camera permissions</li>
+                <li>Point your camera at any QR code below</li>
+                <li>Watch the smart extraction and auto-redirect!</li>
+            </ol>
+            <p><strong>✨ Smart Features:</strong> The scanner automatically extracts meaningful codes from URLs and redirects to verification page.</p>
+        </div>
+
+        <div class="qr-grid">
+            <!-- MEFTAL-SPAS (BVKB51BWRV) -->
+            <div class="qr-card">
+                <div class="logo-section">
+                    <div class="blue-cross-logo">
+                        BLUE<br>CROSS
+                    </div>
+                </div>
+                <div class="status-badge">✅ ORIGINAL</div>
+                <div class="drug-name">MEFTAL-SPAS® TABLETS</div>
+                <div class="drug-details">
+                    <strong>Generic:</strong> Mefenamic Acid and Dicyclomine Hydrochloride Tablets IP<br>
+                    <strong>Manufacturer:</strong> Blue Cross Laboratories Pvt Ltd<br>
+                    <strong>Batch:</strong> MST2512
+                </div>
+                <div class="qr-code" id="qr1"></div>
+                <div class="code-info">
+                    <strong>QR Content:</strong> https://qrbcl.com/5/BVKB51BWRV<br>
+                    <strong>Extracted:</strong> BVKB51BWRV
+                </div>
+            </div>
+
+            <!-- MEFTAL-SPAS (MST2512 - Batch Number) -->
+            <div class="qr-card">
+                <div class="logo-section">
+                    <div class="blue-cross-logo">
+                        BLUE<br>CROSS
+                    </div>
+                </div>
+                <div class="status-badge">✅ ORIGINAL</div>
+                <div class="drug-name">MEFTAL-SPAS® TABLETS</div>
+                <div class="drug-details">
+                    <strong>Batch Number Format</strong><br>
+                    Same product, different QR format<br>
+                    <strong>Batch:</strong> MST2512
+                </div>
+                <div class="qr-code" id="qr2"></div>
+                <div class="code-info">
+                    <strong>QR Content:</strong> MST2512<br>
+                    <strong>Extracted:</strong> MST2512
+                </div>
+            </div>
+
+            <!-- Localhost URL Format -->
+            <div class="qr-card">
+                <div class="status-badge" style="background: #17a2b8;">🔗 LOCALHOST</div>
+                <div class="drug-name">MEFTAL-SPAS® TABLETS</div>
+                <div class="drug-details">
+                    <strong>Local Development Format</strong><br>
+                    Tests localhost URL parsing<br>
+                    <strong>Code:</strong> BVKB51BWRV
+                </div>
+                <div class="qr-code" id="qr3"></div>
+                <div class="code-info">
+                    <strong>QR Content:</strong> http://localhost:3000/verify?code=BVKB51BWRV<br>
+                    <strong>Extracted:</strong> BVKB51BWRV
+                </div>
+            </div>
+
+            <!-- Sample Drug 1 -->
+            <div class="qr-card">
+                <div class="status-badge" style="background: #6f42c1;">📋 SAMPLE</div>
+                <div class="drug-name">Sample Crocin</div>
+                <div class="drug-details">
+                    <strong>Test Data</strong><br>
+                    Sample pharmaceutical product<br>
+                    <strong>Batch:</strong> #1
+                </div>
+                <div class="qr-code" id="qr4"></div>
+                <div class="code-info">
+                    <strong>QR Content:</strong> 1<br>
+                    <strong>Extracted:</strong> 1
+                </div>
+            </div>
+
+            <!-- Sample Drug 2 -->
+            <div class="qr-card">
+                <div class="status-badge" style="background: #6f42c1;">📋 SAMPLE</div>
+                <div class="drug-name">Sample Paracetamol</div>
+                <div class="drug-details">
+                    <strong>Test Data</strong><br>
+                    Sample pharmaceutical product<br>
+                    <strong>Batch:</strong> #2
+                </div>
+                <div class="qr-code" id="qr5"></div>
+                <div class="code-info">
+                    <strong>QR Content:</strong> 2<br>
+                    <strong>Extracted:</strong> 2
+                </div>
+            </div>
+
+            <!-- Complex URL Format -->
+            <div class="qr-card">
+                <div class="status-badge" style="background: #fd7e14;">🌐 URL</div>
+                <div class="drug-name">URL Parameter Test</div>
+                <div class="drug-details">
+                    <strong>Complex URL Format</strong><br>
+                    Tests parameter extraction<br>
+                    <strong>Code:</strong> MST2512
+                </div>
+                <div class="qr-code" id="qr6"></div>
+                <div class="code-info">
+                    <strong>QR Content:</strong> https://medchain.app/verify?code=MST2512&ref=qr<br>
+                    <strong>Extracted:</strong> MST2512
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; color: #666;">
+            <p>🔒 <strong>Blockchain Verified</strong> | 🏥 <strong>MedChain Platform</strong> | 📱 <strong>Smart QR Technology</strong></p>
+        </div>
+    </div>
+
+    <script>
+        // Generate QR codes
+        const qrCodes = [
+            { id: 'qr1', text: 'https://qrbcl.com/5/BVKB51BWRV' },
+            { id: 'qr2', text: 'MST2512' },
+            { id: 'qr3', text: 'http://localhost:3000/verify?code=BVKB51BWRV' },
+            { id: 'qr4', text: '1' },
+            { id: 'qr5', text: '2' },
+            { id: 'qr6', text: 'https://medchain.app/verify?code=MST2512&ref=qr' }
+        ];
+
+        qrCodes.forEach(qr => {
+            QRCode.toCanvas(document.getElementById(qr.id), qr.text, {
+                width: 200,
+                height: 200,
+                color: {
+                    dark: '#2c5530',
+                    light: '#ffffff'
+                },
+                margin: 2,
+                errorCorrectionLevel: 'M'
+            }, function (error) {
+                if (error) console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+
+contract MedChainBase is AccessControl, ReentrancyGuard, Pausable {
+    bytes32 public constant MANUFACTURER_ROLE = keccak256("MANUFACTURER_ROLE");
+    bytes32 public constant DISTRIBUTOR_ROLE = keccak256("DISTRIBUTOR_ROLE");
+    bytes32 public constant HOSPITAL_ROLE = keccak256("HOSPITAL_ROLE");
+    bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+
+    enum DrugStatus { 
+        Manufactured, 
+        WithDistributor, 
+        WithHospital, 
+        DispensedToPatient, 
+        Expired 
+    }
+    
+    enum HospitalType { Urban, Rural }
+    enum RequestStatus { Pending, Approved, Rejected, Fulfilled }
+
+    struct DrugBatch {
+        uint256 batchId;
+        string drugName;
+        string drugCode;
+        address manufacturer;
+        bytes32 merkleRoot;
+        string ipfsHash;
+        uint256 quantity;
+        uint256 originalQuantity;
+        uint256 manufactureDate;
+        uint256 expiryDate;
+        DrugStatus status;
+        address currentHolder;
+        uint256 transferCount;
+        bool isRecalled;
+        string regulatoryApproval;
+    }
+
+    // Basic storage variables
+    mapping(uint256 => DrugBatch) public drugBatches;
+    uint256 public nextBatchId;
+
+    // Events
+    event DrugBatchCreated(uint256 indexed batchId, string drugName, address manufacturer, bytes32 merkleRoot, uint256 quantity);
+    event DrugTransferred(uint256 indexed batchId, address from, address to, DrugStatus newStatus);
+
+    constructor() {
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
+        nextBatchId = 1;
+    }
+
+    // Basic access control modifiers
+    modifier onlyAdmin() {
+        require(hasRole(ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        _;
+    }
+
+    modifier onlyManufacturer() {
+        require(hasRole(MANUFACTURER_ROLE, msg.sender), "Caller is not a manufacturer");
+        _;
+    }
+
+    modifier onlyDistributor() {
+        require(hasRole(DISTRIBUTOR_ROLE, msg.sender), "Caller is not a distributor");
+        _;
+    }
+
+    modifier onlyHospital() {
+        require(hasRole(HOSPITAL_ROLE, msg.sender), "Caller is not a hospital");
+        _;
+    }
+
+    modifier validBatch(uint256 _batchId) {
+        require(_batchId > 0 && _batchId < nextBatchId, "Invalid batch ID");
+        _;
+    }
+}
